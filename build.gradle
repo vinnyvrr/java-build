@@ -10,13 +10,10 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.bmuschko:gradle-docker-plugin:3.0.3'
+         classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
+         classpath 'se.transmode.gradle:gradle-docker:1.2'
     }
 }
-
-import com.bmuschko.gradle.docker.tasks.container.DockerCreateContainer
-import com.bmuschko.gradle.docker.tasks.container.DockerStartContainer
-import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -28,40 +25,83 @@ configurations {
         }
     }
 }
-
+plugins {
+    id 'net.ltgt.apt' version '0.9'
+    id "net.foragerr.jmeter" version "1.0.7-3.0-BETA"
+}
 docker {
   url = 'unix:///var/run/docker.sock'
+}
+project.ext {
+    projectGroup = 'vinod'
+    projectDockerGroup = 'vinodreddyvrr'
+    projectDockerAppName = 'java-j2ee'
+    projectVersion = 'v'
+    mainClass = 'vinod.javaj2ee'
+}
+group projectGroup
+version projectVersion
+
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'docker'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+jmeter {
+    jmLog = file("${project.buildDir}/jmeter/jmeter.log")
 }
 
 dependencies {
     providedCompile group: 'javax', name: 'javaee-api', version:'7.0'
 }
 
-task copyDockerArtifacts(type: Copy) {
-    dependsOn build
-    from('build/libs') {
-        include "javaee-docker-gradle-${project.version}.war"
+mainClassName = mainClass
+
+shadowJar {
+    classifier = 'dist'
+    baseName = 'java-j2ee'
+    mergeServiceFiles()
+    manifest {
+        attributes 'Main-Class': mainClassName
     }
-    from('src/main/docker') {
-        include 'Dockerfile'
+    version = ''
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': mainClassName
     }
-    into 'build/docker'
-    rename "javaee-docker-gradle-${project.version}.war", 'javaee-docker-gradle.war'
 }
 
-task buildImage(type: DockerBuildImage) {
-    dependsOn copyDockerArtifacts
-    inputDir = project.file('build/docker')
-    tag = 'javaee-docker-gradle'
+def dockerTag = projectVersion + ((System.properties.getProperty('build') != null ) ? '.' + System.properties.getProperty('build') : '')
+
+task copyDist(type: Copy, dependsOn: shadowJar) {
+    from 'build/libs'
+    into 'build/docker/libs'
 }
 
-task createContainer(type: DockerCreateContainer) {
-    dependsOn buildImage
-    targetImageId { buildImage.getImageId() }
-    portBindings = ['8080:8080']
+task JavaApiDocker(type: Docker,  dependsOn: [copyConfig, copyDist] ) {
+    dockerfile = "Dockerfile"
+    project.group = projectDockerGroup
+    applicationName = projectDockerAppName
+    tagVersion = version + ((System.properties.getProperty('build') != null ) ? '.' + System.properties.getProperty('build') : '')
 }
 
-task startContainer(type: DockerStartContainer) {
-    dependsOn createContainer
-    targetContainerId { createContainer.getContainerId() }
+task createDockerImage(type:Exec, dependsOn: shadowJar) {
+    commandLine 'docker',  'build',  '-t',  'vinodreddyvrr/java-j2ee', '.'
 }
+
+task tagDockerImage(type:Exec, dependsOn: createDockerImage) {
+    commandLine 'docker',  'tag',  'cwds/cals-api',  "vinodreddyvrr/java-j2ee:$dockerTag"
+}
+
+task pushDockerLatest(type:Exec, dependsOn: createDockerImage) {
+    commandLine 'docker',  'push',  'vinodreddyvrr/java-j2ee:latest'
+}
+
+task dropDockerImage(type:Exec) {
+    commandLine 'docker',  'rmi',  "vinodreddyvrr/java-j2ee:$dockerTag"
+    commandLine 'docker',  'rmi',  "vinodreddyvrr/java-j2ee:latest"
+
+}
+
