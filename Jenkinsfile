@@ -9,4 +9,5 @@ node {
    stage('Build'){
 		def buildInfo = rtGradle.run buildFile: 'build.gradle', tasks: 'jar'
    }
-  }
+   }
+}
