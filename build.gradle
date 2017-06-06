@@ -1,5 +1,5 @@
-group = 'org.javaee.sample'
-version = '1.0-SNAPSHOT'
+group = 'java.sample'
+version = '1.0'
 
 apply plugin: 'war'
 apply plugin: 'com.bmuschko.docker-remote-api'
@@ -33,7 +33,7 @@ docker {
   url = 'unix:///var/run/docker.sock'
 }
 project.ext {
-    projectGroup = 'vinod'
+    projectGroup = 'java.sample'
     projectDockerGroup = 'vinodreddyvrr'
     projectDockerAppName = 'java-j2ee'
     projectVersion = 'v'
