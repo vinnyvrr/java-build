@@ -26,22 +26,10 @@ configurations {
         }
     }
 }
-project.ext {
-    projectGroup = 'java.sample'
-    projectDockerGroup = 'vinodreddyvrr'
-    projectDockerAppName = 'java-j2ee'
-    projectVersion = 'v'
-    mainClass = 'vinod.javaj2ee'
+
+docker {
+  url = 'unix:///var/run/docker.sock'
 }
-group projectGroup
-version projectVersion
-
-apply plugin: 'java'
-apply plugin: 'application'
-apply plugin: 'docker'
-apply plugin: 'com.github.johnrengelman.shadow'
-
-configurations { providedCompile }
 
 dependencies {
     providedCompile group: 'javax', name: 'javaee-api', version:'7.0'
