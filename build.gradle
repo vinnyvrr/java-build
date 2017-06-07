@@ -24,9 +24,6 @@ configurations {
         }
     }
 }
-docker {
-  url = 'unix:///var/run/docker.sock'
-}
 project.ext {
     projectGroup = 'java.sample'
     projectDockerGroup = 'vinodreddyvrr'
