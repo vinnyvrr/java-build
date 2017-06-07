@@ -4,9 +4,10 @@ node {
 	  stage('Preparation') {
 	    checkout scm
 	  }
-        stage 'build'
-	  steps {
-		  sh './gradlew build'
+	  stage ('build') {
+		  steps {
+			  sh './gradlew build'
+		  }
 	  }
   }
 	 catch (e)   {
