@@ -12,6 +12,10 @@ buildscript {
     }
 }
 
+import com.bmuschko.gradle.docker.tasks.container.DockerCreateContainer
+import com.bmuschko.gradle.docker.tasks.container.DockerStartContainer
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
