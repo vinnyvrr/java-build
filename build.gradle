@@ -98,9 +98,3 @@ tasks.withType(JavaCompile) {
             '-Amapstruct.suppressGeneratorTimestamp=true'
     ]
 }
-
-processResources {
-    filter(ReplaceTokens, tokens:[
-            'build.version' : projectVersion,
-    ])
-}
