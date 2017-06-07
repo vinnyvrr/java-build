@@ -1,9 +1,10 @@
 node {
 	
   try {
-	stage 'Preparation'
-	  steps {
+	  stage('Preparation') {
+	    steps {
 		  git branch: 'branch', url: 'https://github.com/vinnyvrr/java-build.git'  
+	    }
 	  }
         stage 'build'
 	  steps {
