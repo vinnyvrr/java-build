@@ -1,12 +1,11 @@
 node {
-  def serverArti = Artifactory.server 'Dev'
-  def rtGradle = Artifactory.newGradleBuild()
+	
   try {
 	stage 'Preparation'
 		git branch: 'branch', url: 'git@github.com:vinnyvrr/java-build.git'  
 	  
 	stage 'Build' 
-		def buildInfo = rtGradle.run buildFile: 'build.gradle', tasks: 'jar'
+		def buildFile: 'build.gradle', tasks: 'jar'
     
   }
 	 catch (e)   {
