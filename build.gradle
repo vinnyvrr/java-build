@@ -92,11 +92,6 @@ task dropDockerImage(type:Exec) {
     commandLine 'docker',  'rmi',  "vinodreddyvrr/java-j2ee:latest"
 
 }
-task publishDocker(dependsOn: [pushDockerVersionTagged, pushDockerLatest]) {
-    doLast {
-        println 'Published'
-    }
-}
 
 tasks.withType(JavaCompile) {
     options.compilerArgs = [
