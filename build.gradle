@@ -39,6 +39,8 @@ apply plugin: 'application'
 apply plugin: 'docker'
 apply plugin: 'com.github.johnrengelman.shadow'
 
+configurations { providedCompile }
+
 dependencies {
     providedCompile group: 'javax', name: 'javaee-api', version:'7.0'
 }
