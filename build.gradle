@@ -68,7 +68,7 @@ task copyDist(type: Copy, dependsOn: shadowJar) {
     into 'build/docker/libs'
 }
 
-task JavaApiDocker(type: Docker,  dependsOn: [copyConfig, copyDist] ) {
+task JavaApiDocker(type: Docker,  dependsOn: copyDist ) {
     dockerfile = "Dockerfile"
     project.group = projectDockerGroup
     applicationName = projectDockerAppName
