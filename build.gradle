@@ -28,62 +28,39 @@ configurations {
 }
 
 
+docker {
+  url = 'unix:///var/run/docker.sock'
+}
+
 dependencies {
     providedCompile group: 'javax', name: 'javaee-api', version:'7.0'
 }
 
-mainClassName = mainClass
-
-shadowJar {
-    classifier = 'dist'
-    baseName = 'java-j2ee'
-    mergeServiceFiles()
-    manifest {
-        attributes 'Main-Class': mainClassName
+task copyDockerArtifacts(type: Copy) {
+    dependsOn build
+    from('build/libs') {
+        include "javaee-docker-gradle-${project.version}.war"
     }
-    version = ''
-}
-
-jar {
-    manifest {
-        attributes 'Main-Class': mainClassName
+    from('src/main/docker') {
+        include 'Dockerfile'
     }
+    into 'build/docker'
+    rename "javaee-docker-gradle-${project.version}.war", 'javaee-docker-gradle.war'
 }
 
-def dockerTag = projectVersion + ((System.properties.getProperty('build') != null ) ? '.' + System.properties.getProperty('build') : '')
-
-task copyDist(type: Copy, dependsOn: shadowJar) {
-    from 'build/libs'
-    into 'build/docker/libs'
+task buildImage(type: DockerBuildImage) {
+    dependsOn copyDockerArtifacts
+    inputDir = project.file('build/docker')
+    tag = 'javaee-docker-gradle'
 }
 
-task JavaApiDocker(type: Docker,  dependsOn: copyDist ) {
-    dockerfile = "Dockerfile"
-    project.group = projectDockerGroup
-    applicationName = projectDockerAppName
-    tagVersion = version + ((System.properties.getProperty('build') != null ) ? '.' + System.properties.getProperty('build') : '')
+task createContainer(type: DockerCreateContainer) {
+    dependsOn buildImage
+    targetImageId { buildImage.getImageId() }
+    portBindings = ['8080:8080']
 }
 
-task createDockerImage(type:Exec, dependsOn: shadowJar) {
-    commandLine 'docker',  'build',  '-t',  'vinodreddyvrr/java-j2ee', '.'
-}
-
-task tagDockerImage(type:Exec, dependsOn: createDockerImage) {
-    commandLine 'docker',  'tag',  'cwds/cals-api',  "vinodreddyvrr/java-j2ee:$dockerTag"
-}
-
-task pushDockerLatest(type:Exec, dependsOn: createDockerImage) {
-    commandLine 'docker',  'push',  'vinodreddyvrr/java-j2ee:latest'
-}
-
-task dropDockerImage(type:Exec) {
-    commandLine 'docker',  'rmi',  "vinodreddyvrr/java-j2ee:$dockerTag"
-    commandLine 'docker',  'rmi',  "vinodreddyvrr/java-j2ee:latest"
-
-}
-
-tasks.withType(JavaCompile) {
-    options.compilerArgs = [
-            '-Amapstruct.suppressGeneratorTimestamp=true'
-    ]
+task startContainer(type: DockerStartContainer) {
+    dependsOn createContainer
+    targetContainerId { createContainer.getContainerId() }
 }
