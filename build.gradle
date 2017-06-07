@@ -2,7 +2,7 @@ group = 'java.sample'
 version = '1.0'
 
 apply plugin: 'war'
-apply plugin: 'com.bmuschko.docker-remote-api'
+apply plugin: "com.bmuschko.docker-remote-api"
 
 buildscript {
     repositories {
