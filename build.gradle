@@ -29,6 +29,10 @@ configurations {
     }
 }
 
+docker {
+  url = 'unix:///var/run/docker.sock'
+}
+
 dependencies {
     providedCompile group: 'javax', name: 'javaee-api', version:'7.0'
 }
