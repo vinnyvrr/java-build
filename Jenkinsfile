@@ -2,7 +2,9 @@ node {
 	
   try {
 	  stage('Preparation') {
-	    checkout scm
+		  steps {
+		  git branch: 'branch', url: 'https://github.com/vinnyvrr/java-build.git'  		
+	    }
 	  }
 	  stage ('build') {
 		  steps {
