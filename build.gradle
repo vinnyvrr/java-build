@@ -39,10 +39,6 @@ apply plugin: 'application'
 apply plugin: 'docker'
 apply plugin: 'com.github.johnrengelman.shadow'
 
-jmeter {
-    jmLog = file("${project.buildDir}/jmeter/jmeter.log")
-}
-
 dependencies {
     providedCompile group: 'javax', name: 'javaee-api', version:'7.0'
 }
